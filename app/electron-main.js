@@ -8,8 +8,8 @@ let mainWindow;
 // Function to create the main application window
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1100,
+    height: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), // Load preload script
     },
