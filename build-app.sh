@@ -2,6 +2,8 @@ clear
 rm -rf app/build
 rm -rf linux-base
 rm -rf windows-base
+rm -rf penguinmod-linux.zip
+rm -rf penguinmod-windows.zip
 
 #Getting the electron package from the PenguinMod servers
 #Linux
@@ -22,7 +24,15 @@ cd penguinmod.github.io
 git pull
 npm install --force
 npm run --silent build
+sleep 5s
 cp -R build ../app
 cd ..
 cp -R app linux-base/resources/
 cp -R app windows-base/resources/
+read -p "Do you want to zip the packages? (Y/N)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    zip -r penguinmod-linux.zip linux-base
+    zip -r penguinmod-windows.zip windows-base
+fi
