@@ -20,7 +20,7 @@ export NODE_OPTIONS=--openssl-legacy-provider
 git clone https://github.com/PenguinMod/penguinmod.github.io.git
 cd penguinmod.github.io
 git pull
-npm install --force --loglevel "error"
+npm install --force
 npm run --silent build
 cp -R build ../app
 cd ..
