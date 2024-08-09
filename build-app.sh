@@ -1,3 +1,4 @@
+echo "Clearing"
 clear
 rm -rf app/build
 rm -rf linux-base

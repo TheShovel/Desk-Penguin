@@ -20,6 +20,6 @@ Thats it! During the process it will ask you if you want to create zip files for
 You can answer with Y or N (Y = Yes and N = No)
 
 # Limitations
-Because this is unofficial and it uses the a unmodified version of PenguinMod editor, I can't
-add a built in pacakger, or remove the projects page and so on. I would have to fork PenguinMod
+Because this is unofficial and it uses a unmodified version of the PenguinMod editor, I can't
+add a built in pacakger, or remove the "projects page" and so on. I would have to fork PenguinMod
 and keep that fork up to date, which I sadly can't dedicate time to
