@@ -1,4 +1,8 @@
 "use strict";
+function repeat(func, times) {
+  func();
+  times && --times && repeat(func, times);
+}
 const { app, BrowserWindow, Menu, shell, screen, dialog } = require("electron");
 const path = require("path");
 
@@ -28,7 +32,7 @@ const defaultProjectURL = new URL("./index.html", resourcesURL).href;
 const createWindow = (windowOptions) => {
   const options = {
     title: "",
-    icon: path.resolve(__dirname, "icon.ico"),
+    icon: path.resolve(__dirname, "icon.png"),
     useContentSize: true,
     webPreferences: {
       sandbox: true,
@@ -48,7 +52,7 @@ const createWindow = (windowOptions) => {
 
   const window = new BrowserWindow(options);
   //enable this for logs
-  //window.webContents.openDevTools();
+  window.webContents.openDevTools();
   return window;
 };
 
@@ -166,12 +170,6 @@ app.on("web-contents-created", (event, contents) => {
   });
   contents.on("before-input-event", (e, input) => {
     const window = BrowserWindow.fromWebContents(contents);
-    if (!window || input.type !== "keyDown") return;
-    if (input.key === "F11" || (input.key === "Enter" && input.alt)) {
-      window.setFullScreen(!window.isFullScreen());
-    } else if (input.key === "Escape" && window.isFullScreen()) {
-      window.setFullScreen(false);
-    }
   });
 });
 
@@ -189,7 +187,7 @@ app.on("session-created", (session) => {
 });
 
 app.on("window-all-closed", () => {
-  app.quit();
+  if (process.platform != "darwin") app.quit();
 });
 
 app.whenReady().then(() => {

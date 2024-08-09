@@ -6,6 +6,8 @@
 - npm (v20 or newer)
 - git
 - curl
+- python2
+- java
 
 This can only be built on Linux. If you want to do this on Windows, you will have to use something
 like WSL (Windows Subsystem for Linux).<br><br>
