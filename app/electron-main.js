@@ -1,195 +1,60 @@
-"use strict";
-function repeat(func, times) {
-  func();
-  times && --times && repeat(func, times);
-}
-const { app, BrowserWindow, Menu, shell, screen, dialog } = require("electron");
+// Import required modules from Electron
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
-const isWindows = process.platform === "win32";
-const isMac = process.platform === "darwin";
-const isLinux = process.platform === "linux";
+// Create a variable to store the main application window
+let mainWindow;
 
-if (isMac) {
-  Menu.setApplicationMenu(
-    Menu.buildFromTemplate([
-      { role: "appMenu" },
-      { role: "fileMenu" },
-      { role: "editMenu" },
-      { role: "windowMenu" },
-      { role: "help" },
-    ]),
-  );
-} else {
-  Menu.setApplicationMenu(null);
+// Function to create the main application window
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    frame: false, // Hide the default window frame
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"), // Load preload script
+    },
+  });
+
+  // Load the HTML file into the main window
+  mainWindow.loadFile(path.join(__dirname, "index.html"));
+
+  // Event handler for when the main window is closed
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
 }
 
-const resourcesURL = Object.assign(new URL("file://"), {
-  pathname: path.join(__dirname, "/"),
-}).href;
-const defaultProjectURL = new URL("./index.html", resourcesURL).href;
+// Create the main window when the app is ready
+app.whenReady().then(createWindow);
 
-const createWindow = (windowOptions) => {
-  const options = {
-    title: "",
-    icon: path.resolve(__dirname, "icon.png"),
-    useContentSize: true,
-    webPreferences: {
-      sandbox: true,
-      contextIsolation: true,
-      nodeIntegration: false,
-    },
-    show: true,
-    ...windowOptions,
-  };
-
-  const activeScreen = screen.getDisplayNearestPoint(
-    screen.getCursorScreenPoint(),
-  );
-  const bounds = activeScreen.workArea;
-  options.x = bounds.x + (bounds.width - options.width) / 2;
-  options.y = bounds.y + (bounds.height - options.height) / 2;
-
-  const window = new BrowserWindow(options);
-  //enable this for logs
-  window.webContents.openDevTools();
-  return window;
-};
-
-const createProjectWindow = (url) => {
-  const windowMode = "window";
-  const options = {
-    show: false,
-    backgroundColor: "#000000",
-    width: 1400,
-    height: 800,
-    minWidth: 1400,
-    minHeight: 800,
-  };
-  // fullscreen === false disables fullscreen on macOS so only set this property when it's true
-  if (windowMode === "fullscreen") {
-    options.fullscreen = true;
-  }
-  const window = createWindow(options);
-  if (windowMode === "maximize") {
-    window.maximize();
-  }
-  window.loadURL(url);
-  window.show();
-};
-
-const createDataWindow = (dataURI) => {
-  const window = createWindow({});
-  window.loadURL(dataURI);
-};
-
-const isResourceURL = (url) => {
-  try {
-    const parsedUrl = new URL(url);
-    return (
-      parsedUrl.protocol === "file:" && parsedUrl.href.startsWith(resourcesURL)
-    );
-  } catch (e) {
-    // ignore
-  }
-  return false;
-};
-
-const SAFE_PROTOCOLS = ["https:", "http:", "mailto:"];
-
-const isSafeOpenExternal = (url) => {
-  try {
-    const parsedUrl = new URL(url);
-    return SAFE_PROTOCOLS.includes(parsedUrl.protocol);
-  } catch (e) {
-    // ignore
-  }
-  return false;
-};
-
-const isDataURL = (url) => {
-  try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.protocol === "data:";
-  } catch (e) {
-    // ignore
-  }
-  return false;
-};
-
-const openLink = (url) => {
-  if (isDataURL(url)) {
-    createDataWindow(url);
-  } else if (isResourceURL(url)) {
-    createProjectWindow(url);
-  } else if (isSafeOpenExternal(url)) {
-    shell.openExternal(url);
-  }
-};
-
-app.on("render-process-gone", (event, webContents, details) => {
-  const window = BrowserWindow.fromWebContents(webContents);
-  dialog.showMessageBoxSync(window, {
-    type: "error",
-    title: "Error",
-    message:
-      "Renderer process crashed: " +
-      details.reason +
-      " (" +
-      details.exitCode +
-      ")",
-  });
-});
-
-app.on("child-process-gone", (event, details) => {
-  dialog.showMessageBoxSync({
-    type: "error",
-    title: "Error",
-    message:
-      details.type +
-      " child process crashed: " +
-      details.reason +
-      " (" +
-      details.exitCode +
-      ")",
-  });
-});
-
-app.on("web-contents-created", (event, contents) => {
-  contents.setWindowOpenHandler((details) => {
-    setImmediate(() => {
-      openLink(details.url);
-    });
-    return { action: "deny" };
-  });
-  contents.on("will-navigate", (e, url) => {
-    if (!isResourceURL(url)) {
-      e.preventDefault();
-      openLink(url);
-    }
-  });
-  contents.on("before-input-event", (e, input) => {
-    const window = BrowserWindow.fromWebContents(contents);
-  });
-});
-
-app.on("session-created", (session) => {
-  session.webRequest.onBeforeRequest(
-    {
-      urls: ["file://*"],
-    },
-    (details, callback) => {
-      callback({
-        cancel: !details.url.startsWith(resourcesURL),
-      });
-    },
-  );
-});
-
+// Quit the app when all windows are closed (except on macOS)
 app.on("window-all-closed", () => {
-  if (process.platform != "darwin") app.quit();
+  if (process.platform !== "darwin") app.quit();
 });
 
-app.whenReady().then(() => {
-  createProjectWindow(defaultProjectURL);
+// Create a new window when the app is activated (on macOS)
+app.on("activate", () => {
+  if (mainWindow === null) createWindow();
+});
+
+// IPC (Inter-Process Communication) handlers for window control
+ipcMain.on("minimize-window", () => {
+  mainWindow.minimize(); // Minimize the main window
+});
+
+ipcMain.on("maximize-window", () => {
+  if (mainWindow.isMaximized()) {
+    // If the window is maximized, unmaximize it and send an event
+    mainWindow.unmaximize();
+    mainWindow.webContents.send("unmaximize-window");
+  } else {
+    // If the window is not maximized, maximize it and send an event
+    mainWindow.maximize();
+    mainWindow.webContents.send("maximized-window");
+  }
+});
+
+ipcMain.on("close-window", () => {
+  mainWindow.close(); // Close the main window
 });
