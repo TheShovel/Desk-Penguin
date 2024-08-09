@@ -29,6 +29,8 @@ cp -R build ../app
 cd ..
 cp -R app linux-base/resources/
 cp -R app windows-base/resources/
+mv linux-base/electron linux-base/penguinmod-desktop
+mv windows-base/electron.exe windows-base/penguinmod-desktop.exe
 read -p "Do you want to zip the packages? (Y/N)" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
