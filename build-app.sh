@@ -60,6 +60,16 @@ cp -R PenguinMod-Render node_modules
 rm -rf node_modules/scratch-render
 mv node_modules/PenguinMod-Render node_modules/scratch-render
 
+#PAINT
+echo "Adding Paint"
+git clone https://github.com/PenguinMod/PenguinMod-Paint.git
+cd PenguinMod-Paint
+git pull
+npm install --force
+cd ..
+cp -R PenguinMod-Paint node_modules
+rm -rf node_modules/scratch-paint
+mv node_modules/PenguinMod-Paint node_modules/scratch-paint
 
 echo "Building PenguinMod"
 npm run --silent build
