@@ -6,6 +6,12 @@ rm -rf linux-base
 rm -rf windows-base
 rm -rf penguinmod-linux.zip
 rm -rf penguinmod-windows.zip
+read -p "Do a clean install? (removes all existing dependencies and repos) (Y/N)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    rm -rf penguinmod.github.io
+fi
 
 echo "Downloading Electron - Linux"
 
@@ -21,9 +27,18 @@ unzip windows.zip -d windows-base
 rm -rf windows.zip
 rm -rf windows-base/resources/default_app.asar
 
+#PM base
 echo "Downloading PenguinMod"
 export NODE_OPTIONS=--openssl-legacy-provider
-git clone https://github.com/PenguinMod/penguinmod.github.io.git
+read -p "Do you want to use a custom GUI made for the desktop app? Using the vanilla UI could cause issues (Y/N)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    git clone https://github.com/TheShovel/brandless-penguin.git
+    mv brandless-penguin penguinmod.github.io
+else
+    git clone https://github.com/PenguinMod/penguinmod.github.io.git
+fi
 cd penguinmod.github.io
 git pull
 npm install --force
@@ -88,7 +103,32 @@ echo "Building PenguinMod"
 npm run --silent build
 sleep 5s
 cp -R build ../app
+git clone https://github.com/PenguinMod/PenguinMod-Packager.git
+cd PenguinMod-Packager
+git pull
+npm install --force
 cd ..
+#vm
+cp -R PenguinMod-Vm PenguinMod-Packager/node_modules
+rm -rf PenguinMod-Packager/node_modules/scratch-vm
+mv PenguinMod-Packager/node_modules/PenguinMod-Vm PenguinMod-Packager/node_modules/scratch-vm
+#blocks
+cp -R PenguinMod-Blocks PenguinMod-Packager/node_modules
+rm -rf PenguinMod-Packager/node_modules/scratch-blocks
+mv PenguinMod-Packager/node_modules/PenguinMod-Blocks PenguinMod-Packager/node_modules/scratch-blocks
+#renderer
+cp -R PenguinMod-Render PenguinMod-Packager/node_modules
+rm -rf PenguinMod-Packager/node_modules/scratch-render
+mv PenguinMod-Packager/node_modules/PenguinMod-Render PenguinMod-Packager/node_modules/scratch-render
+#paint
+cp -R PenguinMod-Paint PenguinMod-Packager/node_modules
+rm -rf PenguinMod-Packager/node_modules/scratch-paint
+mv PenguinMod-Packager/node_modules/PenguinMod-Paint PenguinMod-Packager/node_modules/scratch-paint
+cd PenguinMod-Packager
+npm run --silent build
+cd ..
+cd ..
+cp -R penguinmod.github.io/PenguinMod-Packager/dist app/build/packager-app
 cp -R app linux-base/resources/
 cp -R app windows-base/resources/
 mv linux-base/electron linux-base/penguinmod-desktop
@@ -99,36 +139,4 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
     zip -r penguinmod-linux.zip linux-base
     zip -r penguinmod-windows.zip windows-base
-fi
-read -p "Do you want build the packager? (this is not for the desktop app, its for external use) (Y/N)" -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    cd penguinmod.github.io
-    git clone https://github.com/PenguinMod/PenguinMod-Packager.git
-    cd PenguinMod-Packager
-    git pull
-    npm install --force
-    cd ..
-    #vm
-    cp -R PenguinMod-Vm PenguinMod-Packager/node_modules
-    rm -rf PenguinMod-Packager/node_modules/scratch-vm
-    mv PenguinMod-Packager/node_modules/PenguinMod-Vm PenguinMod-Packager/node_modules/scratch-vm
-    #blocks
-    cp -R PenguinMod-Blocks PenguinMod-Packager/node_modules
-    rm -rf PenguinMod-Packager/node_modules/scratch-blocks
-    mv PenguinMod-Packager/node_modules/PenguinMod-Blocks PenguinMod-Packager/node_modules/scratch-blocks
-    #renderer
-    cp -R PenguinMod-Render PenguinMod-Packager/node_modules
-    rm -rf PenguinMod-Packager/node_modules/scratch-render
-    mv PenguinMod-Packager/node_modules/PenguinMod-Render PenguinMod-Packager/node_modules/scratch-render
-    #paint
-    cp -R PenguinMod-Paint PenguinMod-Packager/node_modules
-    rm -rf PenguinMod-Packager/node_modules/scratch-paint
-    mv PenguinMod-Packager/node_modules/PenguinMod-Paint PenguinMod-Packager/node_modules/scratch-paint
-    cd PenguinMod-Packager
-    npm run --silent build
-    cd ..
-    cd ..
-    cp -R penguinmod.github.io/PenguinMod-Packager/dist packager-app
 fi
