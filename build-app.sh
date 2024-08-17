@@ -65,7 +65,7 @@ read -p "Use safe Renderer version? (Y/N)" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    git reset --hard 4fb797841c8bde69a1c6a877d99065ba718d51f8
+    git reset --hard d838c0b5f529391e893b9da20ac699611fb04fca
 fi
 npm install --force
 cd ..
