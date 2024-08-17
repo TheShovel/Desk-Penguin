@@ -1,5 +1,6 @@
 echo "Clearing"
 clear
+rm -rf packager-app
 rm -rf app/build
 rm -rf linux-base
 rm -rf windows-base
