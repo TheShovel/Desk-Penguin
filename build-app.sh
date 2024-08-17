@@ -32,6 +32,12 @@ echo "Adding VM"
 git clone https://github.com/PenguinMod/PenguinMod-Vm.git
 cd PenguinMod-Vm
 git pull
+read -p "Use safe VM version? (Y/N)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    git reset --hard 0b17faf77385f7c006970a31f35ced6cadd9437c
+fi
 npm install --force
 cd ..
 cp -R PenguinMod-Vm node_modules
@@ -54,6 +60,12 @@ echo "Adding Renderer"
 git clone https://github.com/PenguinMod/PenguinMod-Render.git
 cd PenguinMod-Render
 git pull
+read -p "Use safe Renderer version? (Y/N)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    git reset --hard 6000eab3640901041daf0b64d2262157e6b0556b
+fi
 npm install --force
 cd ..
 cp -R PenguinMod-Render node_modules
@@ -86,4 +98,36 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
     zip -r penguinmod-linux.zip linux-base
     zip -r penguinmod-windows.zip windows-base
+fi
+read -p "Do you want build the packager? (this is not for the desktop app, its for external use) (Y/N)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    cd penguinmod.github.io
+    git clone https://github.com/PenguinMod/PenguinMod-Packager.git
+    cd PenguinMod-Packager
+    git pull
+    npm install --force
+    cd ..
+    #vm
+    cp -R PenguinMod-Vm PenguinMod-Packager/node_modules
+    rm -rf PenguinMod-Packager/node_modules/scratch-vm
+    mv PenguinMod-Packager/node_modules/PenguinMod-Vm PenguinMod-Packager/node_modules/scratch-vm
+    #blocks
+    cp -R PenguinMod-Blocks PenguinMod-Packager/node_modules
+    rm -rf PenguinMod-Packager/node_modules/scratch-blocks
+    mv PenguinMod-Packager/node_modules/PenguinMod-Blocks PenguinMod-Packager/node_modules/scratch-blocks
+    #renderer
+    cp -R PenguinMod-Render PenguinMod-Packager/node_modules
+    rm -rf PenguinMod-Packager/node_modules/scratch-render
+    mv PenguinMod-Packager/node_modules/PenguinMod-Render PenguinMod-Packager/node_modules/scratch-render
+    #paint
+    cp -R PenguinMod-Paint PenguinMod-Packager/node_modules
+    rm -rf PenguinMod-Packager/node_modules/scratch-paint
+    mv PenguinMod-Packager/node_modules/PenguinMod-Paint PenguinMod-Packager/node_modules/scratch-paint
+    cd PenguinMod-Packager
+    npm run --silent build
+    cd ..
+    cd ..
+    cp -R penguinmod.github.io/PenguinMod-Packager/dist packager-app
 fi
