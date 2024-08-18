@@ -45,15 +45,17 @@ npm install --force
 
 #VM
 echo "Adding VM"
-git clone https://github.com/PenguinMod/PenguinMod-Vm.git
-cd PenguinMod-Vm
-git pull
-read -p "Use safe VM version? (Y/N)" -n 1 -r
+read -p "Use modified VM version? (Y/N)" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    git reset --hard 0b17faf77385f7c006970a31f35ced6cadd9437c
+git clone https://github.com/TheShovel/Stable-PM-VM.git
+mv Stable-PM-VM PenguinMod-Vm
+else
+git clone https://github.com/PenguinMod/PenguinMod-Vm.git
 fi
+cd PenguinMod-Vm
+git pull
 npm install --force
 cd ..
 cp -R PenguinMod-Vm node_modules
