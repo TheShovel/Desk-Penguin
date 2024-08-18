@@ -1,17 +1,12 @@
-echo "Clearing"
 clear
+echo "Clearing packages"
 rm -rf packager-app
 rm -rf app/build
 rm -rf linux-base
 rm -rf windows-base
 rm -rf penguinmod-linux.zip
 rm -rf penguinmod-windows.zip
-read -p "Do a clean install? (removes all existing dependencies and repos) (Y/N)" -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    rm -rf penguinmod.github.io
-fi
+rm -rf penguinmod.github.io
 
 echo "Downloading Electron - Linux"
 
