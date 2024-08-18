@@ -73,15 +73,17 @@ mv node_modules/PenguinMod-Blocks node_modules/scratch-blocks
 
 #RENDERER
 echo "Adding Renderer"
-git clone https://github.com/PenguinMod/PenguinMod-Render.git
-cd PenguinMod-Render
-git pull
 read -p "Use safe Renderer version? (Y/N)" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    git reset --hard 6000eab3640901041daf0b64d2262157e6b0556b
+    git clone https://github.com/TheShovel/Stable-PM-Render.git
+else
+    git clone https://github.com/PenguinMod/PenguinMod-Render.git
 fi
+mv Stable-PM-Render PenguinMod-Render
+cd PenguinMod-Render
+git pull
 npm install --force
 cd ..
 cp -R PenguinMod-Render node_modules
