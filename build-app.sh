@@ -59,7 +59,15 @@ mv node_modules/PenguinMod-Vm node_modules/scratch-vm
 
 #BLOCKS
 echo "Adding Blocks"
+read -p "Use modified Blocks version? (Y/N)" -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+git clone https://github.com/TheShovel/Stable-PM-Blocks.git
+mv Stable-PM-Blocks PenguinMod-Blocks
+else
 git clone https://github.com/PenguinMod/PenguinMod-Blocks.git
+fi
 cd PenguinMod-Blocks
 git pull
 npm install --force
